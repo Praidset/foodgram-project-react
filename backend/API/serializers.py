@@ -61,7 +61,7 @@ class CustomUserSerializer(UserSerializer):
         return Subscriptions.objects.filter(
             user=user_id,
             author=author_id
-            ).exists()
+        ).exists()
 
 
 class RecipeCustomUserSerializer(UserSerializer):
@@ -160,13 +160,13 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-                  'ingredients',
-                  'tags',
-                  'author',
-                  'image',
-                  'name',
-                  'text',
-                  'cooking_time'
+                'ingredients',
+                'tags',
+                'author',
+                'image',
+                'name',
+                'text',
+                'cooking_time'
         )
 
     def validate(self, data):

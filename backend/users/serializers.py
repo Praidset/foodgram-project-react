@@ -26,7 +26,7 @@ class CustomUserSerializer(UserSerializer):
         return Subscriptions.objects.filter(
             user=user_id,
             author=author_id
-            ).exists()
+        ).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

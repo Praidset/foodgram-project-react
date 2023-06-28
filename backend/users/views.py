@@ -7,12 +7,10 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
     HTTP_404_NOT_FOUND,
-    )
+)
 from rest_framework.permissions import IsAuthenticated
 from .pagination import CustomPaginator
-from .serializers import (
-                          SubsAuthorsListSerializer,
-                          )
+from .serializers import SubsAuthorsListSerializer
 from .models import CustomUser, Subscriptions
 
 
@@ -69,7 +67,7 @@ class SubscribeAPIView(APIView):
         except Exception:
             return Response({
                 "error": "Вы не подписаны на данного пользователя"},
-                            status=HTTP_400_BAD_REQUEST)
+                status=HTTP_400_BAD_REQUEST)
         else:
             a.delete()
             return Response(status=HTTP_204_NO_CONTENT)

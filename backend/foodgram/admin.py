@@ -2,12 +2,12 @@ from django.contrib import admin
 
 
 from foodgram.models import (
-                            Favourites,
-                            Ingredients,
-                            Recipe,
-                            Recipe_ingredients,
-                            ShoppingCard,
-                            Tags)
+    Favourites,
+    Ingredients,
+    Recipe,
+    Recipe_ingredients,
+    ShoppingCard,
+    Tags)
 
 
 class IngredientResource(admin.ModelAdmin):
