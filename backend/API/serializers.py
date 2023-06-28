@@ -56,12 +56,12 @@ class CustomUserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, instance):
-            user_id = self.context['request'].user.id
-            author_id = instance.id
-            return Subscriptions.objects.filter(
-                user=user_id,
-                author=author_id
-                ).exists()
+        user_id = self.context['request'].user.id
+        author_id = instance.id
+        return Subscriptions.objects.filter(
+            user=user_id,
+            author=author_id
+            ).exists()
 
 
 class RecipeCustomUserSerializer(UserSerializer):
@@ -96,15 +96,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = Recipe_ingredients
         fields = (
             'name', 'measurement_unit', 'amount'
-        )
-
-
-class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Recipe_ingredients
-        fields = (
-            'ingredients', 'amount'
         )
 
 

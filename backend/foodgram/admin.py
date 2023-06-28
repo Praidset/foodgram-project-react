@@ -1,9 +1,13 @@
 from django.contrib import admin
 
 
-from foodgram.models import (Favourites, Ingredients, Recipe,
+from foodgram.models import (
+                            Favourites,
+                            Ingredients,
+                            Recipe,
                             Recipe_ingredients,
-                            ShoppingCard, Tags)
+                            ShoppingCard,
+                            Tags)
 
 
 class IngredientResource(admin.ModelAdmin):

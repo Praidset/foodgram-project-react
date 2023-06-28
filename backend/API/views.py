@@ -7,7 +7,6 @@ from django.http import FileResponse
 from rest_framework import status
 from django.db.models import Sum
 from rest_framework import viewsets
-from django_filters.rest_framework import DjangoFilterBackend
 from foodgram.models import (Tags, Ingredients, Recipe, Recipe_ingredients,
                              Favourites,
                              ShoppingCard

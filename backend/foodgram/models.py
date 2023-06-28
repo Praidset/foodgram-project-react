@@ -33,11 +33,11 @@ class Ingredients(models.Model):
 
 class Tags(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    color = models.CharField(max_length=7, unique=True, validators=[
-            RegexValidator(
-                regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
-                message='Введенное значение не является цветом в формате HEX!'
-            )
+    color = models.CharField(
+        max_length=7, unique=True, validators=[RegexValidator(
+            regex='^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$',
+            message='Введенное значение не является цветом в формате HEX!'
+        )
         ])
     slug = models.SlugField(max_length=200, unique=True)
 
