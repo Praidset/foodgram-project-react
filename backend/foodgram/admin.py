@@ -10,28 +10,6 @@ from foodgram.models import (
     Tags)
 
 
-class IngredientResource(admin.ModelAdmin):
-    class Meta:
-        model = Ingredients
-        fields = (
-            'id',
-            'name',
-            'measurement_unit',
-        )
-
-
-@admin.register(Ingredients)
-class AdminIngredient(admin.ModelAdmin):
-    resource_classes = [IngredientResource]
-    list_display = ('name', 'measurement_unit',)
-    list_filter = ('name', )
-
-
-@admin.register(Tags)
-class AdminTag(admin.ModelAdmin):
-    list_display = ('id', 'name', 'color', )
-
-
 @admin.register(Recipe)
 class AdminRecipe(admin.ModelAdmin):
     list_display = (
@@ -56,3 +34,25 @@ class AdminFavourite(admin.ModelAdmin):
 @admin.register(ShoppingCard)
 class AdminShoppingCart(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'user')
+
+
+@admin.register(Tags)
+class AdminTag(admin.ModelAdmin):
+    list_display = ('id', 'name', 'color', )
+
+
+class IngredientResource(admin.ModelAdmin):
+    class Meta:
+        model = Ingredients
+        fields = (
+            'id',
+            'name',
+            'measurement_unit',
+        )
+
+
+@admin.register(Ingredients)
+class AdminIngredient(admin.ModelAdmin):
+    resource_classes = [IngredientResource]
+    list_display = ('name', 'measurement_unit',)
+    list_filter = ('name', )

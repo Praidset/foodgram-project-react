@@ -4,6 +4,11 @@ from .models import CustomUser, Subscriptions
 User = CustomUser
 
 
+@admin.register(Subscriptions)
+class AdminSubscriptions(admin.ModelAdmin):
+    list_display = ('id', 'author', 'user')
+
+
 @admin.register(User)
 class AdminCustomUser(admin.ModelAdmin):
     list_display = ('id',
@@ -14,8 +19,3 @@ class AdminCustomUser(admin.ModelAdmin):
                     'last_name'
                     )
     list_filter = ('username', 'email',)
-
-
-@admin.register(Subscriptions)
-class AdminSubscriptions(admin.ModelAdmin):
-    list_display = ('id', 'author', 'user')
