@@ -4,7 +4,6 @@ from foodgram.models import (Tags, Ingredients, Recipe, Recipe_ingredients,
                              ShoppingCard
                              )
 from users.models import CustomUser, Subscriptions
-from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 
 
@@ -41,7 +40,7 @@ class CroppedRecipeListSerializer(serializers.ModelSerializer):
         return queryset
 
 
-class CustomUserSerializer(UserSerializer):
+class RecipeCustomUserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta():
@@ -64,24 +63,6 @@ class CustomUserSerializer(UserSerializer):
         ).exists()
 
 
-class RecipeCustomUserSerializer(UserSerializer):
-    is_subscribed = serializers.SerializerMethodField()
-
-    class Meta():
-        model = CustomUser
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed'
-        )
-
-    def get_is_subscribed(self, obj):
-        return False
-
-
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     measurement_unit = serializers.SerializerMethodField()
@@ -102,7 +83,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     ingredients = serializers.SerializerMethodField()
-    author = CustomUserSerializer()
+    author = RecipeCustomUserSerializer()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -150,7 +131,7 @@ class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
 
 class RecipeCUDSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientCreateSerializer(many=True, write_only=True)
-    author = CustomUserSerializer(read_only=True)
+    author = RecipeCustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tags.objects.all(),
         many=True,
