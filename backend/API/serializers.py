@@ -141,13 +141,13 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-                'ingredients',
-                'tags',
-                'author',
-                'image',
-                'name',
-                'text',
-                'cooking_time'
+            'ingredients',
+            'tags',
+            'author',
+            'image',
+            'name',
+            'text',
+            'cooking_time'
         )
 
     def validate(self, data):
