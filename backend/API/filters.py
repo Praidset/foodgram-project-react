@@ -1,8 +1,9 @@
-import django_filters
-import django_filters.rest_framework as filters
 from django.db.models import Q
 
-from foodgram.models import Recipe, Ingredients
+import django_filters
+import django_filters.rest_framework as filters
+
+from foodgram.models import Recipe, Ingredient
 
 
 class IngredientNameFilter(django_filters.Filter):
@@ -16,7 +17,7 @@ class IngredientFilter(filters.FilterSet):
     name = IngredientNameFilter()
 
     class Meta:
-        model = Ingredients
+        model = Ingredient
         fields = ['name']
 
 

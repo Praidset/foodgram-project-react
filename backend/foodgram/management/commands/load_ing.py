@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 import csv
-from foodgram.models import Ingredients
+from foodgram.models import Ingredient
 
 
 class Command(BaseCommand):
@@ -11,6 +11,6 @@ class Command(BaseCommand):
             for row in csv.reader(ingredients):
                 ingredient = row[0]
                 measure = row[1]
-                Ingredients.objects.create(
+                Ingredient.objects.create(
                     name=ingredient, measurement_unit=measure,
                 )

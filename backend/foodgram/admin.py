@@ -1,13 +1,12 @@
 from django.contrib import admin
 
-
 from foodgram.models import (
-    Favourites,
-    Ingredients,
     Recipe,
-    Recipe_ingredients,
-    ShoppingCard,
-    Tags)
+    Recipeingredient,
+    Ingredient,
+    Favourite,
+    ShoppingCart,
+    Tag)
 
 
 @admin.register(Recipe)
@@ -21,29 +20,29 @@ class AdminRecipe(admin.ModelAdmin):
         return obj.favorites.count()
 
 
-@admin.register(Recipe_ingredients)
+@admin.register(Recipeingredient)
 class AdminRecipeIngredient(admin.ModelAdmin):
     list_display = ('recipe', 'ingredients', 'amount',)
 
 
-@admin.register(Favourites)
+@admin.register(Favourite)
 class AdminFavourite(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'user')
 
 
-@admin.register(ShoppingCard)
+@admin.register(ShoppingCart)
 class AdminShoppingCart(admin.ModelAdmin):
     list_display = ('id', 'recipe', 'user')
 
 
-@admin.register(Tags)
+@admin.register(Tag)
 class AdminTag(admin.ModelAdmin):
     list_display = ('id', 'name', 'color', )
 
 
 class IngredientResource(admin.ModelAdmin):
     class Meta:
-        model = Ingredients
+        model = Ingredient
         fields = (
             'id',
             'name',
@@ -51,7 +50,7 @@ class IngredientResource(admin.ModelAdmin):
         )
 
 
-@admin.register(Ingredients)
+@admin.register(Ingredient)
 class AdminIngredient(admin.ModelAdmin):
     resource_classes = [IngredientResource]
     list_display = ('name', 'measurement_unit',)

@@ -1,37 +1,37 @@
 import io
 
 from django.shortcuts import get_object_or_404
-
-from .filters import IngredientFilter, RecipeFilter
 from django.http import FileResponse
-from rest_framework import status
 from django.db.models import Sum
+from rest_framework import status
 from rest_framework import viewsets
-from foodgram.models import (Tags, Ingredients, Recipe, Recipe_ingredients,
-                             Favourites,
-                             ShoppingCard
-                             )
-from .permissions import IsAuthorOrReadOnly
-from .serializers import (TagSerializer, RecipeCUDSerializer, RecipeSerializer,
-                          CroppedRecipeListSerializer, IngredientSerializer)
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly,
                                         AllowAny)
+from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
+
+from foodgram.models import (Tag, Ingredient, Recipe, Recipeingredient,
+                             Favourite,
+                             ShoppingCart
+                             )
+from .permissions import IsAuthorOrReadOnly
+from .serializers import (TagSerializer, RecipeCUDSerializer, RecipeSerializer,
+                          CroppedRecipeListSerializer, IngredientSerializer)
+from .filters import IngredientFilter, RecipeFilter
 
 
 class TagViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny, ]
-    queryset = Tags.objects.all()
+    queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
-    queryset = Ingredients.objects.all()
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     pagination_class = None
     filter_backends = [DjangoFilterBackend]
@@ -47,8 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
             return RecipeCUDSerializer
-        else:
-            return RecipeSerializer
+        return RecipeSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -59,8 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if created:
             serializer = CroppedRecipeListSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(status=status.HTTP_304_NOT_MODIFIED)
+        return Response(status=status.HTTP_304_NOT_MODIFIED)
 
     def delete_from(self, model, user, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
@@ -76,9 +74,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk):
         if request.method == 'POST':
-            return self.add_to(Favourites, request.user, pk)
-        elif request.method == 'DELETE':
-            return self.delete_from(Favourites, request.user, pk)
+            return self.add_to(Favourite, request.user, pk)
+        return self.delete_from(Favourite, request.user, pk)
 
     @action(
         detail=True,
@@ -88,9 +85,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_card(self, request, pk):
         if request.method == 'POST':
-            return self.add_to(ShoppingCard, request.user, pk)
+            return self.add_to(ShoppingCart, request.user, pk)
         elif request.method == 'DELETE':
-            return self.delete_from(ShoppingCard, request.user, pk)
+            return self.delete_from(ShoppingCart, request.user, pk)
 
     @action(
         detail=False,
@@ -100,12 +97,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         shopping_cart = (
-            Recipe_ingredients.objects.filter(
+            Recipeingredient.objects.filter(
                 recipe__targeted__user=request.user
             )
             .values('ingredients__name',
                     'ingredients__measurement_unit', )
-            .annotate(amount=Sum('amount'))
+            .annotate(amount=Sum('values'))
             .order_by('ingredients__name')
         )
 
@@ -113,7 +110,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         for item in shopping_cart:
             buffer.write(f"{item['ingredients__name']}\t")
-            buffer.write(f"{item['amount']}\t")
+            buffer.write(f"{item['values']}\t")
             buffer.write(f"{item['ingredients__measurement_unit']} \n")
 
         response = FileResponse(buffer.getvalue(), content_type='text/plain')

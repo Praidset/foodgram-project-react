@@ -1,10 +1,11 @@
 from django.contrib import admin
-from .models import CustomUser, Subscriptions
+
+from .models import CustomUser, Subscription
 
 User = CustomUser
 
 
-@admin.register(Subscriptions)
+@admin.register(Subscription)
 class AdminSubscriptions(admin.ModelAdmin):
     list_display = ('id', 'author', 'user')
 

@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -9,12 +10,13 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 from rest_framework.permissions import IsAuthenticated
-from .pagination import CustomPaginator
-from .serializers import SubsAuthorsListSerializer
-from .models import CustomUser, Subscriptions
+
+from .models import CustomUser, Subscription
+from api.pagination import CustomPaginator
+from api.serializers import SubsAuthorsListSerializer
 
 
-class MySubscribtionsAPIView(generics.ListAPIView):
+class SubscribtionsAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     pagination_class = CustomPaginator
     serializer_class = SubsAuthorsListSerializer
@@ -31,20 +33,20 @@ class SubscribeAPIView(APIView):
         user = request.user
         try:
             author = CustomUser.objects.get(id=id)
-        except Exception:
+        except ObjectDoesNotExist:
             return Response({
                 "error": "Невозможно подписаться на то , чего не существует"},
                 status=HTTP_404_NOT_FOUND)
         try:
             author.auth_token
-        except Exception:
+        except ObjectDoesNotExist:
             return Response({"error": "Данный пользователь не авторизован"},
                             status=HTTP_401_UNAUTHORIZED)
-        if Subscriptions.objects.filter(user=user, author=author):
+        if Subscription.objects.filter(user=user, author=author):
             return Response({
                 "error": "Вы уже подписаны на данного пользователя"},
                 status=HTTP_400_BAD_REQUEST)
-        Subscriptions.objects.create(user=user, author=author)
+        Subscription.objects.create(user=user, author=author)
         serializer = SubsAuthorsListSerializer(
             author, context={'request': request})
         return Response(serializer.data, status=HTTP_201_CREATED)
@@ -53,21 +55,21 @@ class SubscribeAPIView(APIView):
         user = request.user
         try:
             author = CustomUser.objects.get(id=id)
-        except Exception:
+        except ObjectDoesNotExist:
             return Response({
                 "error": "Невозможно отписаться от того , чего не существует"},
                 status=HTTP_404_NOT_FOUND)
         try:
             author.auth_token
-        except Exception:
+        except ObjectDoesNotExist:
             return Response({"error": "Данный пользователь не авторизован"},
                             status=HTTP_401_UNAUTHORIZED)
         try:
-            a = Subscriptions.objects.get(user=user, author=author)
-        except Exception:
+            subexistence = Subscription.objects.get(user=user, author=author)
+        except ObjectDoesNotExist:
             return Response({
                 "error": "Вы не подписаны на данного пользователя"},
                 status=HTTP_400_BAD_REQUEST)
         else:
-            a.delete()
+            subexistence.delete()
             return Response(status=HTTP_204_NO_CONTENT)
