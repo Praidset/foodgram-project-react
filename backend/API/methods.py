@@ -8,8 +8,8 @@ def CreateUpdate(ingredients, instance=None, recipe=None):
         recipe = recipe
     Recipeingredient.objects.bulk_create(
         [Recipeingredient(
-                    recipe=recipe,
-                    ingredients=Ingredient.objects.get(id=ingredient['id']),
-                    amount=ingredient['amount']
-        ) for ingredient in ingredients]
+                        recipe=recipe,
+                        ingredients=Ingredient.objects.get(id=ing['id']),
+                        amount=ing['amount']
+        ) for ing in ingredients]
     )
