@@ -111,8 +111,8 @@ class Api {
     author,
     tags
   } = {}) {
-      // const token = localStorage.getItem('token')
-      // const authorization = token ? { 'authorization': `Token ${token}` } : {}
+      const token = localStorage.getItem('token')
+      const authorization = token ? { 'authorization': `Token ${token}` } : {}
       const tagsString = tags ? tags.filter(tag => tag.value).map(tag => `&tags=${tag.slug}`).join('') : ''
       return fetch(
         `/api/recipes/?page=${page}&limit=${limit}${author ? `&author=${author}` : ''}${is_favorited ? `&is_favorited=${is_favorited}` : ''}${is_in_shopping_cart ? `&is_in_shopping_cart=${is_in_shopping_cart}` : ''}${tagsString}`,
@@ -120,7 +120,7 @@ class Api {
           method: 'GET',
           headers: {
             ...this._headers,
-            // ...authorization
+            ...authorization
           }
         }
       ).then(this.checkResponse)
@@ -129,15 +129,15 @@ class Api {
   getRecipe ({
     recipe_id
   }) {
-    // const token = localStorage.getItem('token')
-    // const authorization = token ? { 'authorization': `Token ${token}` } : {}
+    const token = localStorage.getItem('token')
+    const authorization = token ? { 'authorization': `Token ${token}` } : {}
     return fetch(
       `/api/recipes/${recipe_id}/`,
       {
         method: 'GET',
         headers: {
           ...this._headers,
-          // ...authorization
+          ...authorization
         }
       }
     ).then(this.checkResponse)
