@@ -19,5 +19,5 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        UniqueConstraint(fields=['recipe', 'ingredient'],
-                         name='unique_user_shopping_recipe')
+        UniqueConstraint(fields=['user', 'author'],
+                         name='unique_user_subscriptions')
