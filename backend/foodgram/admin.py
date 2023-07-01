@@ -12,12 +12,12 @@ from foodgram.models import (
 @admin.register(Recipe)
 class AdminRecipe(admin.ModelAdmin):
     list_display = (
-        'author', 'name', 'image', 'cooking_time', 'text', 'count_favorites',
+        'author', 'name', 'image', 'cooking_time', 'text', 'count_favourites',
     )
     list_filter = ('name', 'author', 'tags',)
 
-    def count_favorites(self, obj):
-        return obj.favorites.count()
+    def count_favourites(self, obj):
+        return obj.favby.count()
 
 
 @admin.register(RecipeIngredient)

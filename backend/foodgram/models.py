@@ -69,7 +69,7 @@ class Favourite(models.Model):
 
     class Meta:
         constraints = [UniqueConstraint(
-            fields=['recipe', 'ingredient'],
+            fields=['recipe', 'user'],
             name='unique_user_favourite_recipe')]
 
 
@@ -84,7 +84,7 @@ class ShoppingCart(models.Model):
 
     class Meta:
         constraints = [UniqueConstraint(
-            fields=['recipe', 'ingredient'],
+            fields=['recipe', 'user'],
             name='unique_user_shopping_recipe')]
 
 
