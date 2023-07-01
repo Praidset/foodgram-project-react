@@ -1,15 +1,17 @@
+from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer
 
-
-from .methods import CreateUpdate
-from rest_framework import serializers
-from foodgram.models import (Tag, Ingredient, Recipe, Recipeingredient,
-                             Favourite,
-                             ShoppingCart
-                             )
-
+from foodgram.models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    Favourite,
+    ShoppingCart
+)
+from .methods import create_or_update
 from users.models import CustomUser, Subscription
 
 
@@ -80,14 +82,14 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    name = serializers.ReadOnlyField(source='ingredients.name')
+    name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredients.measurement_unit')
+        source='ingredient.measurement_unit')
 
     class Meta:
-        model = Recipeingredient
+        model = RecipeIngredient
         fields = (
-            'name', 'measurement_unit', 'amount'
+            'id', 'name', 'measurement_unit', 'amount'
         )
 
 
@@ -130,15 +132,15 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
+    amount = serializers.IntegerField()
 
     class Meta:
-        model = Recipeingredient
+        model = RecipeIngredient
         fields = ('id', 'amount')
-        read_only_fields = ('recipe',)
 
 
 class RecipeCUDSerializer(serializers.ModelSerializer):
-    ingredients = RecipeIngredientCreateSerializer(many=True, write_only=True)
+    ingredients = RecipeIngredientCreateSerializer(many=True, write_only=True,)
     author = CustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
@@ -167,6 +169,7 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
                 'По документации время готовки не меньше минуты , СОГГУ'
             )
         if not ingredients:
+            print(ingredients)
             raise serializers.ValidationError(
                 'Студенческий формат? В рецепте должны быть ингредиенты'
             )
@@ -189,15 +192,14 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
         instance.tags.clear()
         instance.tags.set(tags)
         instance.ingredients.clear()
-        CreateUpdate(ingredients, instance=instance)
-        instance.save()
+        create_or_update(ingredients, instance=instance)
         return instance
 
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        CreateUpdate(ingredients, recipe=recipe)
+        create_or_update(ingredients, recipe=recipe)
         recipe.tags.set(tags)
         return recipe
 

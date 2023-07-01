@@ -2,24 +2,105 @@ import io
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
-from django.db.models import Sum
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly,
-                                        AllowAny)
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+    AllowAny
+)
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.status import (
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_404_NOT_FOUND,
+)
 
-from foodgram.models import (Tag, Ingredient, Recipe, Recipeingredient,
-                             Favourite,
-                             ShoppingCart
-                             )
+from foodgram.models import (
+    Tag,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    Favourite,
+    ShoppingCart
+)
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (TagSerializer, RecipeCUDSerializer, RecipeSerializer,
-                          CroppedRecipeListSerializer, IngredientSerializer)
+from .serializers import (
+    TagSerializer,
+    RecipeCUDSerializer,
+    RecipeSerializer,
+    CroppedRecipeListSerializer,
+    IngredientSerializer
+)
 from .filters import IngredientFilter, RecipeFilter
+from users.models import CustomUser, Subscription
+from api.pagination import CustomPaginator
+from api.serializers import SubsAuthorsListSerializer
+
+
+class SubscribtionsAPIView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPaginator
+    serializer_class = SubsAuthorsListSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return CustomUser.objects.filter(subs__user=user)
+
+
+class SubscribeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id):
+        user = request.user
+        try:
+            author = CustomUser.objects.get(id=id)
+        except CustomUser.DoesNotExist:
+            return Response({
+                "error": "Невозможно подписаться на то , чего не существует"},
+                status=HTTP_404_NOT_FOUND)
+        try:
+            author.auth_token
+        except CustomUser.auth_token.RelatedObjectDoesNotExist:
+            return Response({"error": "Данный пользователь не авторизован"},
+                            status=HTTP_401_UNAUTHORIZED)
+        if Subscription.objects.filter(user=user, author=author):
+            return Response({
+                "error": "Вы уже подписаны на данного пользователя"},
+                status=HTTP_400_BAD_REQUEST)
+        Subscription.objects.create(user=user, author=author)
+        serializer = SubsAuthorsListSerializer(
+            author, context={'request': request})
+        return Response(serializer.data, status=HTTP_201_CREATED)
+
+    def delete(self, request, id):
+        user = request.user
+        try:
+            author = CustomUser.objects.get(id=id)
+        except CustomUser.DoesNotExist:
+            return Response({
+                "error": "Невозможно отписаться от того , чего не существует"},
+                status=HTTP_404_NOT_FOUND)
+        try:
+            author.auth_token
+        except CustomUser.auth_token.RelatedObjectDoesNotExist:
+            return Response({"error": "Данный пользователь не авторизован"},
+                            status=HTTP_401_UNAUTHORIZED)
+        try:
+            subexistence = Subscription.objects.get(user=user, author=author)
+        except Subscription.DoesNotExist:
+            return Response({
+                "error": "Вы не подписаны на данного пользователя"},
+                status=HTTP_400_BAD_REQUEST)
+        else:
+            subexistence.delete()
+            return Response(status=HTTP_204_NO_CONTENT)
 
 
 class TagViewSet(viewsets.ModelViewSet):
@@ -86,8 +167,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_card(self, request, pk):
         if request.method == 'POST':
             return self.add_to(ShoppingCart, request.user, pk)
-        elif request.method == 'DELETE':
-            return self.delete_from(ShoppingCart, request.user, pk)
+        return self.delete_from(ShoppingCart, request.user, pk)
 
     @action(
         detail=False,
@@ -97,21 +177,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         shopping_cart = (
-            Recipeingredient.objects.filter(
+            RecipeIngredient.objects.filter(
                 recipe__targeted__user=request.user
             )
-            .values('ingredients__name',
-                    'ingredients__measurement_unit', )
-            .annotate(amount=Sum('values'))
-            .order_by('ingredients__name')
+            .values('ingredient__name',
+                    'ingredient__measurement_unit',
+                    'amount')
+            .order_by('ingredient__name')
         )
 
         buffer = io.StringIO()
 
         for item in shopping_cart:
-            buffer.write(f"{item['ingredients__name']}\t")
-            buffer.write(f"{item['values']}\t")
-            buffer.write(f"{item['ingredients__measurement_unit']} \n")
+            buffer.write(f"{item['ingredient__name']}\t")
+            buffer.write(f"{item['amount']}\t")
+            buffer.write(f"{item['ingredient__measurement_unit']} \n")
 
         response = FileResponse(buffer.getvalue(), content_type='text/plain')
         response[

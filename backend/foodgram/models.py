@@ -1,7 +1,9 @@
 from django.db import models
-from users.models import CustomUser
+from django.db.models import UniqueConstraint
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
+
+from users.models import CustomUser
 
 
 class Recipe(models.Model):
@@ -20,7 +22,7 @@ class Recipe(models.Model):
     )
     ingredients = models.ManyToManyField('Ingredient',
                                          verbose_name='Ингредиенты',
-                                         through='Recipeingredient')
+                                         through='RecipeIngredient')
     tags = models.ManyToManyField('Tag',
                                   related_name='recipes',
                                   verbose_name='Теги для рецепта')
@@ -66,7 +68,8 @@ class Favourite(models.Model):
         return f'Избранное {self.user}{self.recipe}'
 
     class Meta:
-        unique_together = ['user', 'recipe']
+        UniqueConstraint(fields=['recipe', 'ingredient'],
+                         name='unique_user_favourite_recipe')
 
 
 class ShoppingCart(models.Model):
@@ -79,16 +82,18 @@ class ShoppingCart(models.Model):
         return f'В корзине {self.user} {self.recipe}'
 
     class Meta:
-        unique_together = ['user', 'recipe']
+        UniqueConstraint(fields=['recipe', 'ingredient'],
+                         name='unique_user_shopping_recipe')
 
 
-class Recipeingredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
-    ingredients = models.ForeignKey(Ingredient, on_delete=models.PROTECT,)
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT,)
     amount = models.PositiveIntegerField(validators=[MinValueValidator(1)])
 
     def __str__(self) -> str:
-        return f'{self.ingredients.name} - {self.amount}'
+        return f'{self.ingredient.name} - {self.amount}'
 
     class Meta:
-        unique_together = ['recipe', 'ingredients']
+        UniqueConstraint(fields=['recipe', 'ingredient'],
+                         name='recipe_unique_ingredient')

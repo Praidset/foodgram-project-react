@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import UniqueConstraint
 
 
 class CustomUser(AbstractUser):
@@ -18,4 +19,5 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        unique_together = ['user', 'author']
+        UniqueConstraint(fields=['recipe', 'ingredient'],
+                         name='unique_user_shopping_recipe')

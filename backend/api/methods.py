@@ -1,13 +1,13 @@
-from foodgram.models import Ingredient, Recipeingredient
+from foodgram.models import RecipeIngredient
 
 
-def CreateUpdate(ingredients, instance=None, recipe=None):
+def create_or_update(ingredients, instance=None, recipe=None):
     if instance:
         recipe = instance
     else:
         recipe = recipe
-    Recipeingredient.objects.bulk_create([Recipeingredient(
+    RecipeIngredient.objects.bulk_create([RecipeIngredient(
         recipe=recipe,
-        ingredients=Ingredient.objects.get(id=ing['id']),
+        ingredient_id=ing['id'],
         amount=ing['amount']
     ) for ing in ingredients])

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from foodgram.models import (
     Recipe,
-    Recipeingredient,
+    RecipeIngredient,
     Ingredient,
     Favourite,
     ShoppingCart,
@@ -20,9 +20,9 @@ class AdminRecipe(admin.ModelAdmin):
         return obj.favorites.count()
 
 
-@admin.register(Recipeingredient)
+@admin.register(RecipeIngredient)
 class AdminRecipeIngredient(admin.ModelAdmin):
-    list_display = ('recipe', 'ingredients', 'amount',)
+    list_display = ('recipe', 'ingredient', 'amount',)
 
 
 @admin.register(Favourite)

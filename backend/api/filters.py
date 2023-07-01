@@ -1,7 +1,6 @@
-from django.db.models import Q
-
 import django_filters
 import django_filters.rest_framework as filters
+from django.db.models import Q
 
 from foodgram.models import Recipe, Ingredient
 
