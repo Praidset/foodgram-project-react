@@ -1,12 +1,8 @@
 from rest_framework.routers import SimpleRouter
-
 from django.urls import include, path
 
 from .views import IngredientViewSet, RecipeViewSet, TagViewSet
-from .views import (
-    SubscribtionsAPIView,
-    SubscribeAPIView
-)
+from .views import SubscribtionsAPIView, SubscribeAPIView
 
 app_name = 'users'
 

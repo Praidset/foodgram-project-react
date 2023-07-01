@@ -68,8 +68,9 @@ class Favourite(models.Model):
         return f'Избранное {self.user}{self.recipe}'
 
     class Meta:
-        UniqueConstraint(fields=['recipe', 'ingredient'],
-                         name='unique_user_favourite_recipe')
+        constraints = [UniqueConstraint(
+            fields=['recipe', 'ingredient'],
+            name='unique_user_favourite_recipe')]
 
 
 class ShoppingCart(models.Model):
@@ -82,8 +83,9 @@ class ShoppingCart(models.Model):
         return f'В корзине {self.user} {self.recipe}'
 
     class Meta:
-        UniqueConstraint(fields=['recipe', 'ingredient'],
-                         name='unique_user_shopping_recipe')
+        constraints = [UniqueConstraint(
+            fields=['recipe', 'ingredient'],
+            name='unique_user_shopping_recipe')]
 
 
 class RecipeIngredient(models.Model):
@@ -95,5 +97,6 @@ class RecipeIngredient(models.Model):
         return f'{self.ingredient.name} - {self.amount}'
 
     class Meta:
-        UniqueConstraint(fields=['recipe', 'ingredient'],
-                         name='recipe_unique_ingredient')
+        constraints = [UniqueConstraint(
+            fields=['recipe', 'ingredient'],
+            name='recipe_unique_ingredient')]

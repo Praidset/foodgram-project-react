@@ -19,5 +19,6 @@ class Subscription(models.Model):
     )
 
     class Meta:
-        UniqueConstraint(fields=['user', 'author'],
-                         name='unique_user_subscriptions')
+        constraints = [UniqueConstraint(
+            fields=['user', 'author'],
+            name='unique_user_subscriptions')]

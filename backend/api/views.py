@@ -2,6 +2,7 @@ import io
 
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -62,11 +63,13 @@ class SubscribeAPIView(APIView):
         try:
             author = CustomUser.objects.get(id=id)
         except CustomUser.DoesNotExist:
+            """Проверил , все работает"""
             return Response({
                 "error": "Невозможно подписаться на то , чего не существует"},
                 status=HTTP_404_NOT_FOUND)
         try:
             author.auth_token
+            """Проверил , все работает"""
         except CustomUser.auth_token.RelatedObjectDoesNotExist:
             return Response({"error": "Данный пользователь не авторизован"},
                             status=HTTP_401_UNAUTHORIZED)
@@ -181,8 +184,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 recipe__targeted__user=request.user
             )
             .values('ingredient__name',
-                    'ingredient__measurement_unit',
-                    'amount')
+                    'ingredient__measurement_unit',)
+            .annotate(quantity=Sum('amount'))
             .order_by('ingredient__name')
         )
 
@@ -190,7 +193,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         for item in shopping_cart:
             buffer.write(f"{item['ingredient__name']}\t")
-            buffer.write(f"{item['amount']}\t")
+            buffer.write(f"{item['quantity']}\t")
             buffer.write(f"{item['ingredient__measurement_unit']} \n")
 
         response = FileResponse(buffer.getvalue(), content_type='text/plain')
