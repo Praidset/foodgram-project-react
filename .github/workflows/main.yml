@@ -101,13 +101,8 @@ jobs:
             sudo docker compose -f docker-compose.production.yml up -d
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
-            sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py createuser --username=test --email=test@example.com --noinput
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_ing
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_recipe
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py load_tags
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py createsuperuser --username=test --email=test@example.com --noinput
 
-  send_message:
     runs-on: ubuntu-latest
     needs: deploy
     steps:
