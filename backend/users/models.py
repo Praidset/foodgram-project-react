@@ -4,12 +4,11 @@ from django.db.models import UniqueConstraint
 
 
 class CustomUser(AbstractUser):
-    email = models.EmailField(max_length=254, verbose_name='Почта')
-    first_name = models.CharField(max_length=150, verbose_name='Имя')
-    last_name = models.CharField(max_length=150, verbose_name='Фамилия')
+    email = models.EmailField(max_length=254)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=150,
-                                unique=True,
-                                verbose_name='Ник')
+                                unique=True)
 
     class Meta:
         verbose_name = 'Пользователь'
