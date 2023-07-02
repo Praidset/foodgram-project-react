@@ -9,7 +9,8 @@ class Command(BaseCommand):
     help = 'load ingredients from csv'
 
     def handle(self, *args, **kwargs):
-        with open('ingredients.csv', 'r', encoding='UTF-8') as ingredients:
+        with open('database_data/ingredients.csv',
+                  'r', encoding='UTF-8') as ingredients:
             for row in csv.reader(ingredients):
                 ingredient = row[0]
                 measure = row[1]
