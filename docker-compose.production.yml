@@ -30,7 +30,7 @@ services:
   nginx:
     image: praidset/foodgram_gateway
     ports:
-      - "9000:80"
+      - "8000:80"
     volumes:
       - /frontend/build:/usr/share/nginx/html/
       - /docs/:/usr/share/nginx/html/api/docs/
