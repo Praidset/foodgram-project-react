@@ -2,6 +2,7 @@ from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import UserCreateSerializer
 from djoser.serializers import UserSerializer
+from django.core.validators import MinValueValidator
 
 from foodgram.models import (
     Tag,
@@ -82,9 +83,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(
+        source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit')
+    amount = serializers.ReadOnlyField()
 
     class Meta:
         model = RecipeIngredient
@@ -133,7 +137,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    amount = serializers.IntegerField()
+    amount = serializers.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
         model = RecipeIngredient
@@ -170,7 +174,6 @@ class RecipeCUDSerializer(serializers.ModelSerializer):
                 'По документации время готовки не меньше минуты , СОГГУ'
             )
         if not ingredients:
-            print(ingredients)
             raise serializers.ValidationError(
                 'Студенческий формат? В рецепте должны быть ингредиенты'
             )
