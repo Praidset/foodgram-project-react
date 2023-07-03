@@ -6,7 +6,7 @@ Cайт Foodgram даёт возможность публиковать реце
 ### Как запустить проект:
 Клонируйте репозиторий, перейдите в директорию с проектом:
 
-В директории infra/ создайте файл .env и заполните следующими данными для базы данных (например):
+В корневой директории создайте файл .env и заполните следующими данными для базы данных (например):
 ```
 POSTGRES_USER=django_user
 POSTGRES_PASSWORD=mysecretpassword
@@ -16,22 +16,27 @@ DB_PORT=5432
 
 ```
 
-Запустите контейнер в директории infra/:
+Запустите контейнер в корневой директории директории :
 
 ```
-docker-compose up 
+docker compose up 
 ```
 
-Выполните по очереди команды (во втором git bash окне , в директории infra/):
+Выполните по очереди команды (во втором git bash окне , в корневой директории):
 
 ```
-docker-compose exec backend python manage.py migrate
-docker-compose exec backend python manage.py createsuperuser
-docker-compose exec backend python manage.py collectstatic
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py collectstatic
+
+(Создание Админки)
+docker container ls (получите и скопируйте ID контейнера foodgram-project-react-backend)
+winpty docker exec -ti <номер контейнера> bash
+python manage.py createsuperuser
+
 (Следующие команды по желанию  , для заполнения базу данных заранее подготовленными данными)
-docker-compose exec backend python manage.py load_ing (подгрузка ингредиентов)
-docker-compose exec backend python manage.py load_tags (подгрузка тэгов)
-docker-compose exec backend python manage.py load_recipes (подгрузка 10 тестовых рецептов)
+docker compose exec backend python manage.py load_ing (подгрузка ингредиентов)
+docker compose exec backend python manage.py load_tags (подгрузка тэгов)
+docker compose exec backend python manage.py load_recipes (подгрузка 10 тестовых рецептов)
 ```
 
 После запуска , сайт будет доступен по адресу:
